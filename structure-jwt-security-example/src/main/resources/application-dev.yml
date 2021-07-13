@@ -1,0 +1,5 @@
+structure:
+  jwt:
+    secret: 12345646
+server:
+  port: 8801
