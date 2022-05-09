@@ -79,7 +79,7 @@
         <dependency>
             <groupId>cn.structured</groupId>
             <artifactId>structure-common</artifactId>
-            <version>1.0.2.RELEASE</version>
+            <version>1.0.1.RELEASE</version>
         </dependency>
 
         <dependency>
