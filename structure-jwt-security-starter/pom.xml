@@ -11,7 +11,7 @@
 
     <packaging>jar</packaging>
     <artifactId>structure-jwt-security-starter</artifactId>
-    <version>1.0.1${revision}</version>
+    <version>1.0.4${revision}</version>
     <name>structure-jwt-security</name>
     <description>structure-jwt-security </description>
 

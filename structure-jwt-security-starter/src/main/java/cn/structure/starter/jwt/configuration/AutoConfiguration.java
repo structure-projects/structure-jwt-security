@@ -32,6 +32,9 @@ public class AutoConfiguration {
     @Autowired
     private JwtConfig jwtConfig;
 
+    @Autowired
+    private ITokenService tokenService;
+
     @Bean
     @ConditionalOnMissingBean(PasswordEncoder.class)
     public PasswordEncoder passwordEncoder() {
@@ -49,12 +52,6 @@ public class AutoConfiguration {
     public ITokenService tokenService(){
         return new JwtDefaultServiceImpl(jwtConfig);
     }
-
-//    @Bean
-//    @ConditionalOnMissingBean(CorsFilter.class)
-//    public CorsFilter corsFilter (){
-//        return new CorsFilter();
-//    }
 //
 //
 //    @Bean

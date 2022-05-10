@@ -35,6 +35,8 @@ public class JwtConfig {
      */
     private long jwtTokenValidity = 9 * 60 * 60;
 
+    private String corsFilterClass = "cn.structure.starter.jwt.configuration.CorsFilter";
+
     /**
      * 访问权限
      */
