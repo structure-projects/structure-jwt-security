@@ -1,4 +1,4 @@
-package cn.structure.starter.jwt.configuration;
+package cn.structure.starter.jwt.interfaces;
 
 import javax.servlet.Filter;
 

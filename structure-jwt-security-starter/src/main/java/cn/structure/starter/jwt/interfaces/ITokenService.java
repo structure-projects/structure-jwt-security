@@ -3,6 +3,7 @@ package cn.structure.starter.jwt.interfaces;
 import cn.structure.starter.jwt.entity.AuthUser;
 import io.jsonwebtoken.Claims;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 /**
@@ -50,4 +51,11 @@ public interface ITokenService {
      * @return
      */
     String doGenerateToken(Map<String, Object> claims, String subject);
+
+    /**
+     * 通过请求头中获取token
+     * @param request
+     * @return
+     */
+    String getToken(HttpServletRequest request);
 }

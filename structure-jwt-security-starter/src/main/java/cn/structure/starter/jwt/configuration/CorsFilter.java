@@ -1,5 +1,7 @@
 package cn.structure.starter.jwt.configuration;
 
+import cn.structure.starter.jwt.interfaces.ICorsFilter;
+
 import javax.servlet.*;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;

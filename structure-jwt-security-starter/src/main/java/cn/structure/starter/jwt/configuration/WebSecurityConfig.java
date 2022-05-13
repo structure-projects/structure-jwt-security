@@ -3,11 +3,10 @@ package cn.structure.starter.jwt.configuration;
 import cn.structure.common.constant.AuthConstant;
 import cn.structure.common.constant.SymbolConstant;
 import cn.structure.common.enums.NumberEnum;
-import cn.structure.starter.jwt.filter.LoginFilter;
+import cn.structure.starter.jwt.interfaces.ICorsFilter;
 import cn.structure.starter.jwt.interfaces.ITokenService;
 import cn.structure.starter.jwt.properties.JwtConfig;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -22,7 +21,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import javax.servlet.Filter;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -98,7 +96,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authenticationEntryPoint(jwtAuthenticationEntryPoint)
                 .and().sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        httpSecurity.addFilterBefore(new JwtRequestFilter(tokenService,jwtConfig), UsernamePasswordAuthenticationFilter.class);
+        httpSecurity.addFilterBefore(new JwtRequestFilter(tokenService, jwtConfig), UsernamePasswordAuthenticationFilter.class);
         Class<?> aClass = Class.forName(jwtConfig.getCorsFilterClass());
         ICorsFilter iCorsFilter = (ICorsFilter) aClass.newInstance();
         httpSecurity.addFilterBefore(iCorsFilter, JwtRequestFilter.class);

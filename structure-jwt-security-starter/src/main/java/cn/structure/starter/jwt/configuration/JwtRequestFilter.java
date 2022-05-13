@@ -45,7 +45,7 @@ public class JwtRequestFilter extends OncePerRequestFilter{
             }
         }
 
-        String token = getToken(request);
+        String token = iTokenService.getToken(request);
         if (token == null) {
             chain.doFilter(request, response);
             return;
@@ -69,14 +69,4 @@ public class JwtRequestFilter extends OncePerRequestFilter{
         SecurityContextHolder.getContext().setAuthentication(authentication);
         chain.doFilter(request, response);
     }
-
-    private String getToken(HttpServletRequest request) {
-        String header = request.getHeader("Authorization");
-
-        if (header != null && header.startsWith("Bearer ")) {
-            return header.replace("Bearer ", "");
-        }
-        return null;
-    }
-
 }
