@@ -19,7 +19,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint, Se
 		String json = "{\"code\": -2, \"msg\": \"无效token\", \"data\": null}";
 
 		response.setCharacterEncoding("UTF-8");
-		response.setContentType("text/html;charset=utf-8");
+		response.setContentType("application/json;charset=utf-8");
 		response.getWriter().write(json);
 	}
 }

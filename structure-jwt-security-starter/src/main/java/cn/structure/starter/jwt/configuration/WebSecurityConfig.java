@@ -3,6 +3,8 @@ package cn.structure.starter.jwt.configuration;
 import cn.structure.common.constant.AuthConstant;
 import cn.structure.common.constant.SymbolConstant;
 import cn.structure.common.enums.NumberEnum;
+import cn.structure.starter.jwt.interfaces.ICorsFilter;
+import cn.structure.starter.jwt.interfaces.ITokenService;
 import cn.structure.starter.jwt.properties.JwtConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -29,81 +31,75 @@ import java.util.Set;
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 
-	@Autowired
-	private AuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    @Autowired
+    private AuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
-	@Autowired
-	private UserDetailsService userDetailsService;
+    @Autowired
+    private UserDetailsService userDetailsService;
 
-	@Autowired
-	private JwtRequestFilter jwtRequestFilter;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
-	@Autowired
-	private PasswordEncoder passwordEncoder;
+    @Autowired
+    private ITokenService tokenService;
 
-	@Autowired
-	private JwtConfig jwtConfig;
+    @Autowired
+    private JwtConfig jwtConfig;
 
-//	@Autowired
-//	private CorsFilter corsFilter;
+    @Autowired
+    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder);
+    }
 
-	@Autowired
-	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-		auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder);
-	}
-
-	@Bean
-	@Override
-	public AuthenticationManager authenticationManagerBean() throws Exception {
+    @Bean
+    @Override
+    public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
-	}
+    }
 
-	@Override
-	protected void configure(HttpSecurity httpSecurity) throws Exception {
-//        LoginFilter loginFilter = new LoginFilter(iTokenService);
-//        loginFilter.setAuthenticationManager(authenticationManagerBean());
-		httpSecurity.csrf().disable()
-				.authorizeRequests()
-                .antMatchers("/login")
-                .permitAll()
-				.anyRequest()
-                .authenticated()
-                .and()
-				.exceptionHandling()
+    @Override
+    protected void configure(HttpSecurity httpSecurity) throws Exception {
+        httpSecurity.csrf().disable()
+                .authorizeRequests();
+        Map<String, List<String>> antMatchers = jwtConfig.getAntMatchers();
+        if (antMatchers != null) {
+            Set<String> keys = antMatchers.keySet();
+            for (String key : keys) {
+                if (key.equals(AuthConstant.UN_AUTHENTICATED)) {
+                    List<String> urls = antMatchers.get(key);
+                    for (String url : urls) {
+                        httpSecurity.csrf().disable().authorizeRequests().antMatchers(url).permitAll();
+                    }
+                } else {
+                    String[] authUrlStr = key.split(SymbolConstant.MINUS);
+                    if (authUrlStr.length < NumberEnum.TWO.getValue()) {
+                        continue;
+                    }
+                    String type = authUrlStr[NumberEnum.ZERO.getValue()];
+                    String str = authUrlStr[NumberEnum.ONE.getValue()];
+                    List<String> urls = antMatchers.get(key);
+                    if (type.equals(AuthConstant.ROLE)) {
+                        for (String url : urls) {
+                            httpSecurity.csrf().disable().authorizeRequests().antMatchers(url).hasRole(str);
+                        }
+                    }
+                    if (type.equals(AuthConstant.AUTH)) {
+                        for (String url : urls) {
+                            httpSecurity.csrf().disable().authorizeRequests().antMatchers(url).hasAuthority(str);
+                        }
+                    }
+                }
+            }
+        }
+        httpSecurity.authorizeRequests().anyRequest().authenticated().and()
+                .exceptionHandling()
                 .authenticationEntryPoint(jwtAuthenticationEntryPoint)
                 .and().sessionManagement()
-				.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-		Map<String, List<String>> antMatchers = jwtConfig.getAntMatchers();
-		if (antMatchers != null) {
-			Set<String> keys = antMatchers.keySet();
-			for (String key : keys) {
-				if (key.equals(AuthConstant.UN_AUTHENTICATED)) {
-					List<String> urls = antMatchers.get(key);
-					for (String url : urls) {
-						httpSecurity.csrf().disable().authorizeRequests().antMatchers(url).permitAll();
-					}
-				}else{
-					String [] authUrlStr = key.split(SymbolConstant.MINUS);
-					if (authUrlStr.length < NumberEnum.TWO.getValue()) {
-						continue;
-					}
-					String type = authUrlStr[NumberEnum.ZERO.getValue()];
-					String str = authUrlStr[NumberEnum.ONE.getValue()];
-					List<String> urls = antMatchers.get(key);
-					if (type.equals(AuthConstant.ROLE)) {
-						for (String url : urls) {
-							httpSecurity.csrf().disable().authorizeRequests().antMatchers(url).hasRole(str);
-						}
-					}
-					if (type.equals(AuthConstant.AUTH)) {
-						for (String url : urls) {
-							httpSecurity.csrf().disable().authorizeRequests().antMatchers(url).hasAuthority(str);
-						}
-					}
-				}
-			}
-		}
-        httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
-        //httpSecurity.addFilterBefore(corsFilter, JwtRequestFilter.class);
-	}
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        httpSecurity.addFilterBefore(new JwtRequestFilter(tokenService, jwtConfig), UsernamePasswordAuthenticationFilter.class);
+        Class<?> aClass = Class.forName(jwtConfig.getCorsFilterClass());
+        ICorsFilter iCorsFilter = (ICorsFilter) aClass.newInstance();
+        httpSecurity.addFilterBefore(iCorsFilter, JwtRequestFilter.class);
+
+    }
 }

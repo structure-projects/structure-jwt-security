@@ -32,6 +32,7 @@
         <dependency>
             <groupId>cn.structured</groupId>
             <artifactId>structure-jwt-security-starter</artifactId>
+            <version>${structure.version}</version>
         </dependency>
     </dependencies>
 
