@@ -4,13 +4,20 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-parent</artifactId>
+        <version>2.1.4.RELEASE</version>
+    </parent>
+
     <groupId>cn.structured</groupId>
     <artifactId>structure-jwt-security-example</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <properties>
-        <spring-boot.version>2.1.4.RELEASE</spring-boot.version>
-        <structure.version>1.1.2.RELEASE</structure.version>
+        <spring-boot.version>${project.parent.version}</spring-boot.version>
+        <structure.version>1.2.0.RELEASE</structure.version>
     </properties>
 
     <dependencies>
@@ -31,21 +38,18 @@
 
         <dependency>
             <groupId>cn.structured</groupId>
+            <artifactId>structure-common</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.structured</groupId>
             <artifactId>structure-jwt-security-starter</artifactId>
-            <version>${structure.version}</version>
         </dependency>
     </dependencies>
 
 
     <dependencyManagement>
         <dependencies>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-parent</artifactId>
-                <version>${spring-boot.version}</version>
-                <scope>import</scope>
-                <type>pom</type>
-            </dependency>
             <dependency>
                 <groupId>cn.structured</groupId>
                 <artifactId>structure-boot-parent</artifactId>
@@ -55,6 +59,18 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>8</source>
+                    <target>8</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
 
 </project>
